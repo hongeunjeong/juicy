@@ -1,0 +1,121 @@
+<!DOCTYPE HTML>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="keywords" content="" />
+    <meta name="description" content="" />
+    <link rel="stylesheet" href="../../../css/reset.css" />
+	<script src="../../../js/jquery-1.11.1.min.js"></script>
+	<style type="text/css">
+		.slide_wrap {width:500px; height:500px; overflow:hidden;}
+		.slide_track:after {content:""; display:block; clear:both}
+		.slide_list {float:left; width:500px; height:500px;}
+	</style>
+ 
+</head>
+<body>
+	<div class="slide_wrap">
+		<div class="slide_list">list01</div>
+		<div class="slide_list">list02</div>
+		<div class="slide_list">list03</div>
+		<div class="slide_list">list04</div>
+		<div class="slide_list">list05</div>
+	</div>
+
+	<button class="prev">이전</button>
+	<button class="next">다음</button>
+
+</body>
+
+<script type="text/javascript">
+	(function($){
+		var slide = function(){
+			var $slide = $('.slide_wrap'),
+				currentIdx = 0;
+			
+			var dotSet = function($selector){
+				var pagingWrap = '<div class="paging_wrap"><ul></ul></div>',
+					slidelen = $selector.find('.slide_list').length,
+					dotText = 'item';
+				
+				$selector.wrap('<div class="slide_wrapper"></div>');
+				$selector.parent().append(pagingWrap);
+
+				for(var i=0; i<slidelen ; i++){
+					$selector.parent('.slide_wrapper').find('.paging_wrap ul').append(
+						'<li class="dotList"><button><span>'+ dotText + (i+1) +'</span></button></li>'
+					)
+				}
+			}
+
+			var slideWidthSet = function($selector){
+				var slidelen = $selector.find('.slide_list').length;
+				var	slideWidth = $selector.find('.slide_list').eq(0).outerWidth();
+				$selector.find('.slide_list').wrapAll('<div class="slide_track"></div>').parent().css('width',slidelen*slideWidth);
+			}
+
+			var slideMove = function($selector, dir){
+				var slideTrack = $selector.find('.slide_track'),
+					slideList = $selector.find('.slide_list'),
+					slideWidth = $selector.find('.slide_list').eq(0).outerWidth();
+					maxVal = slideList.length -1;
+
+					if(dir=="next" && currentIdx < maxVal){
+						slideTrack.not(':animated').animate({
+							'margin-left' : "-=" + slideWidth
+						},300,function(){
+							currentIdx++;
+						})
+					} else if(dir=="prev" && currentIdx > 0){
+						slideTrack.not(':animated').animate({
+							'margin-left' : "+=" + slideWidth
+						},300,function(){
+							currentIdx--;
+						})
+					}
+			}
+
+			var pagingMove = function($selector,index){
+				var slideTrack = $selector.find('.slide_track'),
+					slideWidth  = $selector.find('.slide_list').eq(0).outerWidth();
+				
+				currentIdx = index;
+
+				slideTrack.not(':animated').animate({
+					'margin-left' : currentIdx * (-slideWidth)
+				},300)
+			}
+
+
+
+			$slide.each(function(){
+				var $this = $(this);
+				slideWidthSet($this);
+				dotSet($this);
+				
+			})
+
+			$('.prev').click(function(){
+				slideMove($('.slide_wrap'),'prev');
+			})
+
+			$('.next').click(function(){
+				slideMove($('.slide_wrap'),'next');
+			})
+
+			$('.slide_wrapper button').click(function(){
+				var slideIdx = $(this).parents('li').index();
+
+				pagingMove($('.slide_wrap'),slideIdx)
+
+			})
+
+		}
+
+		slide();
+	}(jQuery));
+	
+	
+</script>
+</html>
